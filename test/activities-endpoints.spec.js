@@ -18,11 +18,11 @@ describe('Activities Endpoints', function() {
   after('disconnect from db', () => db.destroy())
   before('clean the table', () => db.raw('TRUNCATE activities RESTART IDENTITY CASCADE'));
   afterEach('cleanup',() => db.raw('TRUNCATE activities RESTART IDENTITY CASCADE'));
- 
   
   //==================================
   // GET activities
   //==================================
+
   describe(`GET /api/activities`, () => {
     context(`Given no activities`, () => {
       it(`responds with 200 and an empty list`, () => {
@@ -45,73 +45,93 @@ describe('Activities Endpoints', function() {
           .expect(200, testActivity)
       })
     })
-
-
-  })// end of describ GET activities
+  })
 
   //==================================
   // POST activities
   //==================================
+
   describe(`POST /api/activities`, () => {
-    const testActivity = makeActivitiesArray();
-
-    beforeEach('insert activity', () => {
-      return db.into('activities').insert(testActivity)
-    })
-
-    it.skip(`Responds with 201 and the activity`, () => {
+    it('Responds with 201 and the activity', () => {
       const newActivity = {
-        name: 'Test new Name',
-        supplies: 'Test new Supplies',
-        directions: 'Test new Directions'
+        name: 'Test activity name',
+        supplies: 'Test new supplies',
+        directions: 'Test new directions'
       }
-
       return supertest(app)
         .post('/api/activities')
         .send(newActivity)
         .expect(201)
         .expect(res => {
+          expect(res.body).to.have.property('id')
           expect(res.body.name).to.eql(newActivity.name)
           expect(res.body.supplies).to.eql(newActivity.supplies)
           expect(res.body.directions).to.eql(newActivity.directions)
         })
     })
-  })
+  });
   
   //==================================
   // GET activities with id
   //==================================
-  describe(`GET /api/activities/:id`, () => {
-    context(`Given no activity with selected id`, () => {
-      const testActivity = makeActivitiesArray();
-      
-      beforeEach('insert activity', () => {
-        return db.into('activities').insert(testActivity)
-      })
 
-      it(`Responds with 404`, () => {
+  describe(`GET /api/activities/:id`, () => {
+    context(`Given no activities`, () => {
+      it(`responds with 404`, () => {
         const activityId = 123456
 
         return supertest(app)
-          .get(`api/activities/${activityId}`)
-          .expect(404, { error: {
-            message: `The activity does not exist`
-          }})
+          .get(`/api/activities/${activityId}`)
+          .expect(404, { error: { 
+            message: `The activity does not exist` }
+          })
       })
-    })
+    });
+
+    context('Given there are activities in the database', () => {
+      const testActivity = makeActivitiesArray();
+
+      beforeEach('insert activities', () => {
+        return db 
+          .into('activities')
+          .insert(testActivity)
+      })
+
+      it('responds with 200 and the specified activity', () => {
+        const activityId = 2
+        const expectedActivity = testActivity[activityId - 1]
+        return supertest(app)
+          .get(`/api/activities/${activityId}`)
+          .expect(200, expectedActivity)
+      });
+    });
   })
-  
-  
-  
 
   //==================================
   // DELETE activities
   //==================================
 
-  
-  
-  
+  describe(`DELETE /api/activities/:id`, () => {
+    const testActivity = makeActivitiesArray();
+
+      beforeEach('insert activities', () => {
+        return db 
+          .into('activities')
+          .insert(testActivity)
+      })
+    
+    it('responds with 200 and removes the activity', () => {
+      const idToRemove = 2;
+      const testActivity = makeActivitiesArray();
+      const expectedActivity = testActivity.filter(activity => activity.id !== idToRemove);
+      return supertest(app)
+        .delete(`/api/activities/${idToRemove}`)
+        .expect(200)
+        .then(res => {
+          supertest(app)
+            .get(`/api/activities`)
+            .expect(expectedActivity)
+        })
+    });
+  });
 });//end of all
-
-
-

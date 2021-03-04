@@ -15,6 +15,7 @@ const serializeActivity = activity => ({
 /* ------------------------------------------- */
 /* GET ALL ACTIVITIES */
 /* ------------------------------------------- */
+
 activityRouter.route('/api/activities')
 .get((req, res, next) => {
   ActivityService.getAllActivities(req.app.get('db'))
@@ -27,6 +28,7 @@ activityRouter.route('/api/activities')
 /* ------------------------------------------- */
 /* POST NEW ACTIVITY */
 /* ------------------------------------------- */
+
 activityRouter.route('/api/activities')
   .post(bodyParser, (req, res, next) => {
     const { name, supplies, directions } = req.body
@@ -58,6 +60,7 @@ activityRouter.route('/api/activities')
 /* ------------------------------------------- */
 /* POST NEW ACTIVITY */
 /* ------------------------------------------- */
+
 activityRouter.route('/api/activities/:id')
   .all((req, res, next) => {
     if(isNaN(parseInt(req.params.id))) {
@@ -90,6 +93,7 @@ activityRouter.route('/api/activities/:id')
 /* ------------------------------------------- */
 /* DELETE ACTIVITY */
 /* ------------------------------------------- */
+
 activityRouter.route('/api/activities/:id')
 .delete((req, res, next) => {
   ActivityService.deleteActivity(
