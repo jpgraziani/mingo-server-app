@@ -21,4 +21,4 @@ activityRouter.route('/api/activities')
     .catch(next)
 })
 
-module.exports = recipesRouter;
+module.exports = activityRouter;
