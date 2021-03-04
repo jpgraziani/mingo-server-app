@@ -1,5 +1,6 @@
 const path = require('path')
 const express = require('express')
+const xss = require('xss');
 const ActivityService = require('./activity-service')
 const activityRouter = express.Router()
 const bodyParser = express.json();
@@ -7,9 +8,9 @@ const bodyParser = express.json();
 const serializeActivity = activity => ({
   id: activity.id,
   created: activity.created,
-  name: activity.name,
-  supplies: activity.supplies,
-  directions: activity.directions
+  name: xss(activity.name),
+  supplies: xss(activity.supplies),
+  directions: xss(activity.directions)
 });
 
 /* ------------------------------------------- */
